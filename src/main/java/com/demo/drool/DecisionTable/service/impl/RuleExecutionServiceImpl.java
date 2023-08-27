@@ -1,6 +1,7 @@
 package com.demo.drool.DecisionTable.service.impl;
 
 import com.demo.drool.DecisionTable.model.RuleExecution;
+import com.demo.drool.DecisionTable.model.WorkflowDecisionLabel;
 import com.demo.drool.DecisionTable.service.RuleExecutionService;
 import com.demo.drool.DecisionTable.service.StorageService;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,16 @@ public class RuleExecutionServiceImpl implements RuleExecutionService {
                     CommandFactory.newGetObjects(new ClassObjectFilter(RuleExecution.class), "output")
             );
             ExecutionResults results = kSession.execute(CommandFactory.newBatchExecution(commands));
-            return (List<RuleExecution>) results.getValue("output");
+            List<RuleExecution> output = (List<RuleExecution>) results.getValue("output");
+            output.forEach(ruleExecution1 -> {
+                if (Objects.isNull(ruleExecution1.getWorkflowDecisionLabel())) {
+                    log.info("no rule was executed for decisionType {}, decisionLabel {}. providing default value",
+                            ruleExecution1.getDecision().getDecisionType(),
+                            ruleExecution1.getDecision().getDecisionLabel());
+                    ruleExecution1.setWorkflowDecisionLabel(WorkflowDecisionLabel.WorkflowDecisionLabelEnum.DEFAULT);
+                }
+            });
+            return output;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

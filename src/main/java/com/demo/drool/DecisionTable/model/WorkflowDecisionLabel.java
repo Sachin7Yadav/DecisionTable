@@ -10,6 +10,7 @@ public class WorkflowDecisionLabel {
         OPTION_1,
         OPTION_2,
         OPTION_3,
-        OPTION_4;
+        OPTION_4,
+        DEFAULT;
     }
 }
